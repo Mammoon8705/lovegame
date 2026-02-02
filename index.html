@@ -100,12 +100,13 @@ const messages = [
     "Love is growing 🌸",
     "My heart beats for you 💓",
     "So sweet 🥰",
-    "Good girl NEHA🖤",
-    "My cutie penguin🐧",
+    "Good girl NEHA 🖤",
+    "My cutie penguin 🐧",
     "Romance level up 💞",
     "Heart stolen 💗",
     "Pure love 💖",
     "Don't drop me 😳",
+    "Don't stop baby!💕",
     "Hold me tight 💘"
 ];
 
@@ -200,6 +201,7 @@ function loseLife() {
 
     if (lives <= 0) {
         endGame("💔 Game Over! You broke my HEART!!!.");
+        musicStarted = false;
     } else {
         heart.style.top = "50px";
         moveHeart();
