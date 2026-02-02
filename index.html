@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love Chase Game</title>
+
+<style>
+body {
+    background: linear-gradient(135deg, #ffd1dc, #ffe6f0);
+    font-family: "Comic Sans MS", cursive;
+    text-align: center;
+    height: 100vh;
+    overflow: hidden;
+    color: #ff4d6d;
+}
+
+#info { font-size: 18px; }
+
+#heart {
+    position: absolute;
+    font-size: 70px;
+    cursor: pointer;
+    user-select: none;
+}
+
+#message {
+    margin-top: 10px;
+    font-size: 20px;
+}
+
+#gameOver {
+    display: none;
+    font-size: 26px;
+    margin-top: 15px;
+    color: #ff006e;
+}
+
+button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: hotpink;
+    color: white;
+    border: none;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+.explode {
+    animation: explode 0.6s forwards;
+}
+
+@keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(2); }
+    100% { transform: scale(0); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<h1>💖 Love Chase 💖</h1>
+
+<div id="info">
+Score: <span id="score">0</span> |
+Lives: <span id="lives">3</span> |
+Level: <span id="level">1</span><br>
+High Score: <span id="highScore">0</span>
+</div>
+
+<div id="message">Catch the heart to spread love 💕</div>
+
+<div id="heart">❤️</div>
+
+<div id="gameOver"></div>
+<button id="restartBtn" onclick="restartGame()" style="display:none;">Restart</button>
+
+<!-- AUDIO -->
+<audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="loseSound">
+    <source src="lose.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let score, lives, level, speed, fallSpeed, gravityInterval;
+let musicStarted = false;
+
+const heart = document.getElementById("heart");
+const gameOverText = document.getElementById("gameOver");
+const messageBox = document.getElementById("message");
+
+const bgMusic = document.getElementById("bgMusic");
+const loseSound = document.getElementById("loseSound");
+
+const messages = [
+    "You're adorable 💕",
+    "Love is growing 🌸",
+    "My heart beats for you 💓",
+    "So sweet 🥰",
+    "Good girl NEHA🖤",
+    "My cutie penguin🐧",
+    "Romance level up 💞",
+    "Heart stolen 💗",
+    "Pure love 💖",
+    "Don't drop me 😳",
+    "Hold me tight 💘"
+];
+
+let highScore = localStorage.getItem("highScore") || 0;
+document.getElementById("highScore").innerText = highScore;
+
+function randomMessage() {
+    return messages[Math.floor(Math.random() * messages.length)];
+}
+
+function startMusic() {
+    if (!musicStarted) {
+        bgMusic.volume = 0.4;
+        bgMusic.play();
+        musicStarted = true;
+    }
+}
+
+function startGame() {
+    score = 0;
+    lives = 3;
+    level = 1;
+    speed = 0.5;
+    fallSpeed = 2;
+
+    document.getElementById("score").innerText = score;
+    document.getElementById("lives").innerText = lives;
+    document.getElementById("level").innerText = level;
+
+    gameOverText.style.display = "none";
+    document.getElementById("restartBtn").style.display = "none";
+
+    heart.classList.remove("explode");
+    heart.innerText = "❤️";
+    messageBox.innerText = "Catch the heart to spread love 💕";
+
+    moveHeart();
+    gravityInterval = setInterval(gravity, 40);
+}
+
+function moveHeart() {
+    let x = Math.random() * (window.innerWidth - 80);
+    let y = Math.random() * (window.innerHeight / 3);
+
+    heart.style.transition = `left ${speed}s, top ${speed}s`;
+    heart.style.left = x + "px";
+    heart.style.top = y + "px";
+}
+
+// click + touch
+heart.addEventListener("click", hitHeart);
+heart.addEventListener("touchstart", hitHeart);
+
+function hitHeart() {
+    startMusic();
+
+    score++;
+    document.getElementById("score").innerText = score;
+    messageBox.innerText = randomMessage();
+
+    if (score % 5 === 0) {
+        level++;
+        document.getElementById("level").innerText = level;
+        fallSpeed += 1;
+        if (speed > 0.15) speed -= 0.05;
+        messageBox.innerText = "Level Up! 💖 " + randomMessage();
+    }
+
+    moveHeart();
+}
+
+function gravity() {
+    let currentTop = heart.offsetTop;
+    heart.style.top = currentTop + fallSpeed + "px";
+
+    if (heart.offsetTop + heart.offsetHeight >= window.innerHeight) {
+        loseLife();
+    }
+}
+
+function loseLife() {
+    loseSound.currentTime = 0;
+    loseSound.play();
+
+    lives--;
+    document.getElementById("lives").innerText = lives;
+    messageBox.innerText = "Oh no! 💔 " + randomMessage();
+
+    if (lives <= 0) {
+        endGame("💔 Game Over! You broke my HEART!!!.");
+    } else {
+        heart.style.top = "50px";
+        moveHeart();
+    }
+}
+
+function endGame(text) {
+    clearInterval(gravityInterval);
+
+    heart.classList.add("explode");
+    updateHighScore();
+
+    gameOverText.style.display = "block";
+    gameOverText.innerText = text + " Final Score: " + score;
+
+    document.getElementById("restartBtn").style.display = "inline-block";
+}
+
+function updateHighScore() {
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+        document.getElementById("highScore").innerText = highScore;
+    }
+}
+
+function restartGame() {
+    startGame();
+}
+
+startGame();
+</script>
+
+</body>
+</html>
