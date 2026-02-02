@@ -76,7 +76,6 @@ High Score: <span id="highScore">0</span>
 <div id="gameOver"></div>
 <button id="restartBtn" onclick="restartGame()" style="display:none;">Restart</button>
 
-<!-- AUDIO -->
 <audio id="bgMusic" loop>
     <source src="music.mp3" type="audio/mpeg">
 </audio>
@@ -143,6 +142,11 @@ function startGame() {
     heart.innerText = "❤️";
     messageBox.innerText = "Catch the heart to spread love 💕";
 
+    // reset music flag (but don't autoplay)
+    musicStarted = false;
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+
     moveHeart();
     gravityInterval = setInterval(gravity, 40);
 }
@@ -156,7 +160,6 @@ function moveHeart() {
     heart.style.top = y + "px";
 }
 
-// click + touch
 heart.addEventListener("click", hitHeart);
 heart.addEventListener("touchstart", hitHeart);
 
@@ -172,7 +175,7 @@ function hitHeart() {
         document.getElementById("level").innerText = level;
         fallSpeed += 1;
         if (speed > 0.15) speed -= 0.05;
-        messageBox.innerText = "Level Up! 💖 " + randomMessage();
+        messageBox.innerText = "Level Up! 💖 "<br> + randomMessage();
     }
 
     moveHeart();
@@ -205,6 +208,10 @@ function loseLife() {
 
 function endGame(text) {
     clearInterval(gravityInterval);
+
+    // STOP MUSIC WHEN YOU LOSE
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
 
     heart.classList.add("explode");
     updateHighScore();
